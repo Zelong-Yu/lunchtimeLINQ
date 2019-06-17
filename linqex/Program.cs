@@ -13,6 +13,55 @@ namespace linqex
     {
         static void Main(string[] args)
         {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            //lunchtime challenge 3 https://markheath.net/post/linq-challenge-3
+            //1 Longest Sequence
+            var longest="1,2,1,1,0,3,1,0,0,2,4,1,0,0,0,0,2,1,0,3,1,0,0,0,6,1,3,0,0,0"
+                .Split(',')
+                .Aggregate(seed: new { localcount = 0, globallongest = 0 },
+                func: (prev, ch) =>
+                  {
+                      int localcount = ch == "0" ? prev.localcount + 1 : 0;
+                      int globallongest = localcount > prev.globallongest ?
+                           localcount : prev.globallongest;
+                      return new { localcount, globallongest };
+                  },
+                resultSelector: x => x.globallongest);
+            Console.WriteLine(longest);
+
+            //2 Full House
+            "4♣ 5♦ 6♦ 7♠ 10♥;10♣ Q♥ 10♠ Q♠ 10♦;6♣ 6♥ 6♠ A♠ 6♦;2♣ 3♥ 3♠ 2♠ 2♦;2♣ 3♣ 4♣ 5♠ 6♠"
+                .Split(';')
+                .Select(x => x.Split(' '))
+                .Select(hand => (hand, hand.GroupBy(card => card.TrimEnd('♣', '♦', '♠', '♥'),
+                card => card,
+                (value, group) => new { Key = value, Count = group.Count() }
+                )))
+                //.Where(g => g.Item2.Count() == 2)
+                .Where(g=>g.Item2.Any(x=>x.Count==3))
+                .Where(g => g.Item2.Any(x => x.Count == 2))
+                .Select(g => String.Join(" ", g.Item1))
+                .ToList().ForEach(Console.WriteLine);
+
+            //3 Christmas Days
+            //4 Anagrams
+            "parts,traps,arts,rats,starts,tarts,rat,art,tar,tars,stars,stray"
+                .Split(',')
+                .Select(x => (x, x.Aggregate(new int[26],(prev,ch)=> { prev[ch - 'a']++; return prev; })))
+                .Where(p => p.Item2.SequenceEqual("star".Aggregate(new int[26], (prev, ch) => { prev[ch - 'a']++; return prev; })))
+                .ToList().ForEach(p=>Console.WriteLine(p.Item1));
+
+            //5 Initial Letters
+            var sameinigp="Santi Cazorla, Per Mertesacker, Alan Smith, Thierry Henry, Alex Song, Paul Merson, Alexis Sánchez, Robert Pires, Dennis Bergkamp, Sol Campbell"
+                .Split(',')
+                .GroupBy(x => new string(x.Trim().Split(' ').Select(n => n[0]).ToArray()));
+            sameinigp.ToList().ForEach(x => { Console.WriteLine($"initial:{x.Key}");
+                x.ToList().ForEach(Console.WriteLine);
+            });
+
+            //6
+
+
             var fibs = new FibNums();
             Console.WriteLine(fibs.AllFibs().ElementAt(100));
 
