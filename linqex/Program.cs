@@ -44,23 +44,36 @@ namespace linqex
                 .ToList().ForEach(Console.WriteLine);
 
             //3 Christmas Days
+            Console.WriteLine(String.Join(",", Enumerable.Range(2018, 10).Select(x => new DateTime(x, 12, 25).DayOfWeek)));
+
             //4 Anagrams
             "parts,traps,arts,rats,starts,tarts,rat,art,tar,tars,stars,stray"
                 .Split(',')
                 .Select(x => (x, x.Aggregate(new int[26],(prev,ch)=> { prev[ch - 'a']++; return prev; })))
                 .Where(p => p.Item2.SequenceEqual("star".Aggregate(new int[26], (prev, ch) => { prev[ch - 'a']++; return prev; })))
                 .ToList().ForEach(p=>Console.WriteLine(p.Item1));
+            Console.WriteLine("Alternative way");
+            "parts,traps,arts,rats,starts,tarts,rat,art,tar,tars,stars,stray"
+                .Split(',')
+                .Where(w => w.Length == "star".Length
+                && String.Join("", w.OrderBy(c => c)).Contains(String.Join("", "star".OrderBy(c => c))))
+                .ToList().ForEach(Console.WriteLine);
 
             //5 Initial Letters
             var sameinigp="Santi Cazorla, Per Mertesacker, Alan Smith, Thierry Henry, Alex Song, Paul Merson, Alexis Sánchez, Robert Pires, Dennis Bergkamp, Sol Campbell"
                 .Split(',')
-                .GroupBy(x => new string(x.Trim().Split(' ').Select(n => n[0]).ToArray()));
+                .GroupBy(x => new string(x.Trim().Split(' ').Select(n => n[0]).ToArray()),x=>x.Trim());
             sameinigp.ToList().ForEach(x => { Console.WriteLine($"initial:{x.Key}");
                 x.ToList().ForEach(Console.WriteLine);
             });
 
             //6
-
+            Console.WriteLine(String.Join(";",( "0:00:00-0:00:05;0:55:12-1:05:02;1:37:47-1:37:51"
+                .Replace("-", "*")
+                .Replace(";", "-")+"-2:00:00")
+                .Split('*')
+                .Skip(1)
+                ));
 
             var fibs = new FibNums();
             Console.WriteLine(fibs.AllFibs().ElementAt(100));
